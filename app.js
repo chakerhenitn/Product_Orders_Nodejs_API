@@ -21,6 +21,7 @@ mongoose.Promise = global.Promise;
 //end database connection
 
 app.use(morgan('dev'));
+app.use('/uploads', express.static('uploads'));
 //apply bodyparser to requests
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());

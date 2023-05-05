@@ -1,5 +1,37 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const multer = require('multer');
+
+// the file storage strategy
+const storage = multer.diskStorage({
+    
+destination: function(req, file, cb){
+    cb(null, './uploads/');
+},
+filename: function(req, file, cb){
+    cb(null, Date.now()+ file.originalname);
+}
+});
+
+// one filter
+const fileFilter = (req, file, cb)=>{
+    console.log(file);
+//reject a files
+if(file.mimetype === 'image/jpeg' || file.mimetype ==='image/png'){
+    cb(null, true);
+} else{
+    cb(null, false);
+}
+};
+//
+const upload = multer({
+    storage: storage, 
+    limits:{
+    fileSize: 1024 * 1024 * 5
+},
+fileFilter: fileFilter
+}
+);
 const Product = require("../models/product");
 
 const router = express.Router();
@@ -9,7 +41,7 @@ const { json } = require("body-parser");
 
 router.get("/", async (req, res, next) => {
 await Product.find()
-.select('name price _id')
+.select('name price _id productImage')
     .exec()
     .then((docs) => {
     const response={
@@ -19,6 +51,7 @@ await Product.find()
                 name: doc.name,
                 price: doc.price,
                 _id: doc._id,
+                productImage: doc.productImage,
                 request:{
                     type: 'GET',
                     url:'http://localhost:3000/products/'+ doc._id
@@ -50,11 +83,12 @@ await Product.find()
     });
 });
 
-router.post("/", async (req, res, next) => {
-const product = await new Product({
+router.post("/",upload.single('productImage') ,async (req, res, next) => {
+    const product = await new Product({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
     price: req.body.price,
+    productImage: req.file.path
 });
 product
     .save()
@@ -83,7 +117,7 @@ product
 router.get("/:prodID", async (req, res, next) => {
 const id = req.params.prodID;
 await Product.findById(id)
-.select('name price _id')
+.select('name price _id productImage')
     .exec()
     .then((doc) => {
     console.log("Reteaved From Database", doc);
