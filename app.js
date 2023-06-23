@@ -9,7 +9,7 @@ const orderRoutes = require('./api/routes/orders');
 // connection to the database 
 
 
-mongoose.connect('mongodb+srv://chakerhenitn:chakerhenitn@nodejsapi.svop4cj.mongodb.net/?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://1111111:22222222@nodejsapi.svop4cj.mongodb.net/?retryWrites=true&w=majority', {
 useNewUrlParser: true,
 useUnifiedTopology: true,
 });
